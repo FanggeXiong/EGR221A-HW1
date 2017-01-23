@@ -1,22 +1,24 @@
+//Hannah Bernal
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
 //This class allows the notes of each guitar string oscillate in given frequency to the appropriate sound
+
 public class KPGuitarString implements GuitarString{
 
-    //the size of the ring buffer
+    //The size of the ring buffer
     private int N = 0;
-    //constant value of the sample rate
-    public static final double SRATE = StdAudio.SAMPLE_RATE;
-    //the constant energy decay rate when note is played
-    public static final double ENERGYRATE = 0.996;
-    //ring buffer of guitar that filters notes
+    //Constant value of the sample rate
+    private static final double SRATE = StdAudio.SAMPLE_RATE;
+    //The constant energy decay rate when note is played
+    private static final double ENERGYRATE = 0.996;
+    //Ring buffer of guitar that filters notes
     private Queue<Double> ringBuffer = new LinkedList<>();
 
-   //constructs guitar string of given frequency
+   //Constructs guitar string from the given frequency
     public KPGuitarString(double frequency) {
-
         N = Math.round((float)(SRATE / frequency));
         if (frequency <= 0 || N < 2) {
             throw new IllegalArgumentException();
@@ -26,18 +28,18 @@ public class KPGuitarString implements GuitarString{
         }
     }
 
-    //constructs guitar string and initializes contents of ring buffer to values in array
-    //used only for testing purposes
+    //Constructs guitar string and inserts values into the ring buffer
+    //Used only for testing purposes
     public KPGuitarString(double[] init) {
-        if (init.length< 2) {
+        if (init.length < 2) {
             throw new IllegalArgumentException();
         }
-        for (int i = 0; i < init.length; i++) {
-            ringBuffer.add(init[i]);
+        for (double num: init) {
+            ringBuffer.add(num);
         }
     }
 
-    //replaces the N elements in ring buffer w/ random N values between -.5 and 5
+    //Replaces the values of the ring buffer with random values -.5 to .5
     @Override
     public void pluck(){
         Random rand = new Random();
@@ -47,15 +49,14 @@ public class KPGuitarString implements GuitarString{
         }
     }
 
-    //creates new element at end of ring buffer due to energy decay rate
+    //Deletes the first sample from the ring buffer and adds the average of
+    //the first two samples scaled by the energy decay factor
     @Override
     public void tic(){
-        double a = ringBuffer.remove();
-        double b = ringBuffer.peek();
-        ringBuffer.add(ENERGYRATE * .5 * (a + b));
+        ringBuffer.add(ENERGYRATE * .5 * (ringBuffer.remove() + ringBuffer.peek()));
     }
 
-    //returns the current sample of ring buffer
+    //Returns the current sample of ring buffer
     @Override
     public double sample(){
         return ringBuffer.peek();

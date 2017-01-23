@@ -1,23 +1,32 @@
-//this class implements Guitar interface to allow full version of guitar strings
+//This program uses this class to play the guitar in all 37 keys using
+//the keyboard and by implementing the Guitar interface.
+//Start the program and press any key to play Guitar37
 public class Guitar37 implements Guitar {
 
-    //array holds the concert for each note
+    //Holds the concert for each note
     private GuitarString[] keyStrings = new GuitarString[37];
-    //the list of keyboard keys allowed to be played
+    //The list of keyboard keys allowed to be played
     public static final String KEYBOARD =
             "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
-    //maps to keyStrings, holds respective frequency for each concert
+    //Maps to keyStrings, holds respective frequency for each concert
     private double[] concertFrequency = new double[37];
-    //counts the number of times tic is called
+    //Counts the number of times tic is called
     private int count = 0;
 
-    //constructor uses either the full or simple version of strings
-    public Guitar37(boolean useKP) {
-        //possibly make it into helper method???
+    //Helper method initializes calculated frequencies into the concertFrequency array
+    private double[] helperMethod() {
         for (int i = 0; i < KEYBOARD.length(); i++) {
-            concertFrequency[i] = 440 * Math.pow(2, (i-24 + 0.0) / 12);
+            concertFrequency[i] = 440 * Math.pow(2, (i - 24 + 0.0) / 12);
         }
-            //instantiate KPGuitarString and assign it to each element in the array
+        return concertFrequency;
+    }
+
+    //Constructor uses either the full or simple version of strings
+    public Guitar37(boolean useKP) {
+        //Helper Method is called to return value of array to this constructor
+        helperMethod();
+        //Instantiates each value of keyStrings to either KPGuitarString or SimpleGuitarString
+        // depending on the value of useKP
         for (int i = 0; i < concertFrequency.length; i++) {
             if (useKP) {
                 keyStrings[i] = new KPGuitarString(concertFrequency[i]);
@@ -28,7 +37,7 @@ public class Guitar37 implements Guitar {
         }
     }
 
-    //method uses given pitch to choose note to play
+    //Method uses given pitch to choose note to play
     @Override
     public void playNote(int pitch) {
        int index = pitch + 12;
@@ -38,13 +47,13 @@ public class Guitar37 implements Guitar {
         keyStrings[index].pluck();
     }
 
-    //method returns whether or not the inputted key is permitted
+    //Method returns whether or not the inputted key is permitted
     @Override
     public boolean hasString(char key) {
         return (KEYBOARD.contains(key + ""));
     }
 
-    //method uses given key to pluck one of notes
+    //Method uses given key to pluck the corresponding key
     @Override
     public void pluck(char key) {
         if (!KEYBOARD.contains(key + "")) {
@@ -53,26 +62,26 @@ public class Guitar37 implements Guitar {
         keyStrings[KEYBOARD.indexOf(key)].pluck();
     }
 
-    //method calculates and returns sample of list of notes played
+    //Method calculates and returns sample of list of notes played
     @Override
     public double sample() {
         double sum = 0;
-        for (int i = 0; i < keyStrings.length; i++) {
-            sum += keyStrings[i].sample();
+        for (GuitarString keys:keyStrings) {
+            sum += keys.sample();
         }
         return sum;
     }
 
-    //method tics each concert played
+    //Method "tics" each concert played
     @Override
     public void tic() {
-        for (int i = 0; i < keyStrings.length; i++) {
-            keyStrings[i].tic();
+        for (GuitarString keys:keyStrings) {
+            keys.tic();
         }
         count++;
     }
 
-    //method returns the length of time that tic is called
+    //Method returns the length of time that tic is called
     @Override
     public int time() {
         return count;
